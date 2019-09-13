@@ -10,7 +10,7 @@ public class sortTest {
 	public static int selection;
 
 	public static void main(String args[]) throws Exception {
-		selection = Integer.parseInt(args[0]);
+		 selection = Integer.parseInt(args[0]);
 		ArrayList<Integer> integers = new ArrayList<Integer>();
 		createAndWriteInitFile();
 		long start = System.nanoTime();
@@ -24,6 +24,8 @@ public class sortTest {
 				mergesort(integers);
 			else if (selection == 2)
 				quickSort(integers);
+			else if (selection == 3)
+				heapSort(integers);
 			FileOutputStream fos = new FileOutputStream(f);
 			fos.write('\0');
 			File nf = new File("B:/Projects/AAC_Shreyam/AAC_Shreyam/mergeSort/src/" + j + ".txt");
@@ -54,6 +56,8 @@ public class sortTest {
 					mergesort(integers);
 				else if (selection == 2)
 					quickSort(integers);
+				else if (selection == 3)
+					heapSort(integers);
 				pf = new File("B:/Projects/AAC_Shreyam/AAC_Shreyam/mergeSort/src/" + file + ".txt");
 				pf.createNewFile();
 				FileWriter fw = new FileWriter(pf);
@@ -149,15 +153,15 @@ public class sortTest {
 	}
 
 	public static void mergesort(ArrayList<Integer> values) {
-		sort(values, 0, values.size() - 1);
+		sortM(values, 0, values.size() - 1);
 		System.out.println(values.size() + " values sorted");
 	}
 
-	public static void sort(ArrayList<Integer> values, int l, int r) {
+	public static void sortM(ArrayList<Integer> values, int l, int r) {
 		if (l < r) {
 			int m = (l + r) / 2;
-			sort(values, l, m);
-			sort(values, m + 1, r);
+			sortM(values, l, m);
+			sortM(values, m + 1, r);
 			merge(values, l, m, r);
 		}
 	}
@@ -203,16 +207,18 @@ public class sortTest {
 		System.out.println(values.size() + " values sorted");
 	}
 
+	public static void heapSort(ArrayList<Integer> values) {
+		sortH(values);
+		System.out.println(values.size() + " values sorted");
+	}
+
 	public static int partition(ArrayList<Integer> values, int low, int high) {
 		int pivot = values.get(high);
 		int i = low - 1;
 		for (int j = low; j < high; j++) {
 			if (values.get(j) < pivot) {
 				i++;
-				int num1 = values.get(i);
-				int num2 = values.get(j);
-				values.set(i, num2);
-				values.set(j, num1);
+				Collections.swap(values, i, j);
 			}
 		}
 		values.remove(high);
@@ -241,33 +247,30 @@ public class sortTest {
 		}
 	}
 
-	public void sortH(ArrayList<Integer> values) {
+	public static void sortH(ArrayList<Integer> values) {
 		int n = values.size();
 
 		// Build heap (rearrange array)
 		for (int i = n / 2 - 1; i >= 0; i--)
-			heapify(values, n, i);
+			heapify(values,n, i);
 
 		// One by one extract an element from heap
 		for (int i = n - 1; i >= 0; i--) {
 			// Move current root to end
-				int num1 = values.get(i);
-				int num2 = values.get(0);
-				values.set(i, num2);
-				values.set(0, num1);
-
-			//int temp = arr[0];
-			//arr[0] = arr[i];
-			//arr[i] = temp;
+			Collections.swap(values, i, 0);
+			// int temp = arr[0];
+			// arr[0] = arr[i];
+			// arr[i] = temp;
 
 			// call max heapify on the reduced heap
-			heapify(values, i, 0);
+			heapify(values,i, 0);
 		}
 	}
 
 	// To heapify a subtree rooted with node i which is
 	// an index in arr[]. n is size of heap
-	void heapify(ArrayList<Integer> values, int n, int i) {
+	public static void heapify(ArrayList<Integer> values,int n, int i) {
+		//int n = values.size();
 		int largest = i; // Initialize largest as root
 		int l = 2 * i + 1; // left = 2*i + 1
 		int r = 2 * i + 2; // right = 2*i + 2
@@ -282,13 +285,9 @@ public class sortTest {
 
 		// If largest is not root
 		if (largest != i) {
-			int swap1 = values.remove(i);
-			int swap2 = values.remove(largest);
-			values.set(i, swap2);
-			values.set(largest, swap1);
-
+			Collections.swap(values, i, largest);
 			// Recursively heapify the affected sub-tree
-			heapify(values, n, largest);
+			heapify(values,n, largest);
 		}
 	}
 }
