@@ -1,6 +1,4 @@
-import java.awt.Dimension;
 import java.io.*;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -8,13 +6,16 @@ import java.util.concurrent.TimeUnit;
 
 public class sortTest {
 	public static int selection;
+	static int noFiles;
 
 	public static void main(String args[]) throws Exception {
-		 selection = Integer.parseInt(args[0]);
+		selection = Integer.parseInt(args[0]);
+		// selection=3;
 		ArrayList<Integer> integers = new ArrayList<Integer>();
 		createAndWriteInitFile();
 		long start = System.nanoTime();
-		for (int j = 0; j < 8; j++) {
+		for (int j = 0; j < noFiles; j++) {
+			long singleSorts = System.nanoTime();
 			File f = new File("B:/Projects/AAC_Shreyam/AAC_Shreyam/mergeSort/src/" + j + ".txt");
 			integers.addAll(readIntermediateFile(j));
 			// sc.close();
@@ -35,19 +36,32 @@ public class sortTest {
 				// System.out.println(integers.get(i)+"\n");
 				fw.write(integers.get(i) + "\n");
 			}
-			integers.clear();
 			fos.close();
 			fw.close();
+			long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - singleSorts);
+			System.out.println("Time take is for " + integers.size() + " is " + duration + " ms");
+			integers.clear();
 		}
-		int totalFiles = 8;
-		while (totalFiles > 1) {
+		while (noFiles > 1) {
+			File f = new File("B:/Projects/AAC_Shreyam/AAC_Shreyam/mergeSort/src/");
+			File[] files = f.listFiles(new FilenameFilter() {
+
+				@Override
+				public boolean accept(File dir, String name) {
+					return name.endsWith(".txt") && !name.contains("unsort");
+				}
+			});
 			int file = 0;
-			for (int i = 0; i < totalFiles; i += 2) {
-				File pf = new File("B:/Projects/AAC_Shreyam/AAC_Shreyam/mergeSort/src/" + i + ".txt");
-				File cf = new File("B:/Projects/AAC_Shreyam/AAC_Shreyam/mergeSort/src/" + (i + 1) + ".txt");
+			for (int i = 0; i < files.length - 1; i += 2) {
+
+				long mergedFileSort = System.nanoTime();
+				File pf = files[i];
+				File cf = files[i + 1];
 				// data.addAll(Files);
-				integers.addAll(readIntermediateFile(i));
-				integers.addAll(readIntermediateFile(i + 1));
+				String pfName = pf.getName();
+				String cfName = cf.getName();
+				integers.addAll(readIntermediateFile(Integer.parseInt(pfName.substring(0, pfName.indexOf(".")))));
+				integers.addAll(readIntermediateFile(Integer.parseInt(cfName.substring(0, cfName.indexOf(".")))));
 				cf.delete();
 				pf.delete();
 				if (selection == 0)
@@ -66,13 +80,15 @@ public class sortTest {
 				}
 				System.out.println("sorted File " + file + " created");
 				file++;
+				long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - mergedFileSort);
+				System.out.println("Time taken for " + integers.size() + " is " + duration + " ms");
 				integers.clear();
 				fw.close();
 			}
-			totalFiles /= 2;
+			noFiles = noFiles % 2 == 0 ? noFiles / 2 : (noFiles / 2) + 1;
 		}
 		long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
-		System.out.println("Time take is " + duration + " ms");
+		System.out.println("Time taken is " + duration + " ms");
 	}
 
 	public static void createAndWriteInitFile() {
@@ -92,7 +108,7 @@ public class sortTest {
 			fw.close();
 			Scanner sc = new Scanner(f);
 			int countInFile = 50000;
-			int noFiles = total / countInFile;
+			noFiles = total / countInFile;
 			for (int i = 0; i < noFiles; i++) {
 				File nf = new File("B:/Projects/AAC_Shreyam/AAC_Shreyam/mergeSort/src/" + i + ".txt");
 				nf.createNewFile();
@@ -252,7 +268,7 @@ public class sortTest {
 
 		// Build heap (rearrange array)
 		for (int i = n / 2 - 1; i >= 0; i--)
-			heapify(values,n, i);
+			heapify(values, n, i);
 
 		// One by one extract an element from heap
 		for (int i = n - 1; i >= 0; i--) {
@@ -263,14 +279,14 @@ public class sortTest {
 			// arr[i] = temp;
 
 			// call max heapify on the reduced heap
-			heapify(values,i, 0);
+			heapify(values, i, 0);
 		}
 	}
 
 	// To heapify a subtree rooted with node i which is
 	// an index in arr[]. n is size of heap
-	public static void heapify(ArrayList<Integer> values,int n, int i) {
-		//int n = values.size();
+	public static void heapify(ArrayList<Integer> values, int n, int i) {
+		// int n = values.size();
 		int largest = i; // Initialize largest as root
 		int l = 2 * i + 1; // left = 2*i + 1
 		int r = 2 * i + 2; // right = 2*i + 2
@@ -287,7 +303,7 @@ public class sortTest {
 		if (largest != i) {
 			Collections.swap(values, i, largest);
 			// Recursively heapify the affected sub-tree
-			heapify(values,n, largest);
+			heapify(values, n, largest);
 		}
 	}
 }
